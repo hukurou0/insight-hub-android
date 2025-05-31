@@ -1,0 +1,10 @@
+root = true
+
+[*]
+ktlint = enabled
+ktlint_standard_function-naming = disabled
+
+[app/src/main/gen/**]
+generated_code = true
+ij_formatter_enabled = true
+ktlint = disabled
