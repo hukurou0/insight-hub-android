@@ -34,12 +34,12 @@ fun SplashView() {
     ) {
         Column(
             modifier = Modifier.fillMaxHeight(),
-            verticalArrangement = Arrangement.SpaceBetween,
+            verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = "Insight Hub",
-                fontSize = 24.sp,
+                fontSize = 32.sp,
                 style = MaterialTheme.typography.titleLarge,
             )
         }

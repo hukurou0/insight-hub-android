@@ -1,29 +1,39 @@
 package com.example.insighthub.ui.auth
-
-import AuthViewModel
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 
 enum class AuthMode(
     val label: String,
@@ -34,35 +44,40 @@ enum class AuthMode(
 
 @Preview
 @Composable
-fun AuthView(viewModel: AuthViewModel = AuthViewModel()) {
+fun AuthView(viewModel: AuthViewModel = remember { AuthViewModel() }) {
     Column(
         modifier =
             Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(16.dp),
-        verticalArrangement = Arrangement.SpaceBetween,
+        verticalArrangement = Arrangement.SpaceEvenly,
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Spacer(modifier = Modifier.height(10.dp))
-
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(text = "Insight Hub", style = MaterialTheme.typography.titleMedium)
-            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Insight Hub",
+                fontSize = 32.sp,
+                style = MaterialTheme.typography.titleLarge,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "\"読むだけ\"で終わらない\n学びの新体験を",
                 textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
+                color = MaterialTheme.colorScheme.outline,
             )
         }
 
-        Spacer(modifier = Modifier.height(10.dp))
-
         Column {
-            TabRow(selectedTabIndex = viewModel.mode.ordinal) {
+            TabRow(selectedTabIndex = viewModel.mode.ordinal, contentColor = MaterialTheme.colorScheme.primary) {
                 AuthMode.entries.forEachIndexed { index, mode ->
                     Tab(
                         text = { Text(mode.label) },
-                        selected = viewModel.mode == mode,
-                        onClick = { viewModel.mode = mode },
+                        selected = viewModel.mode.ordinal == index,
+                        onClick = {
+                            val newMode = if (mode == AuthMode.LogIn) AuthMode.LogIn else AuthMode.SignUp
+                            viewModel.mode = newMode
+                        },
                         enabled = !viewModel.isLoading,
                     )
                 }
@@ -71,21 +86,62 @@ fun AuthView(viewModel: AuthViewModel = AuthViewModel()) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+                val cornerRadius = 12.dp
+
                 OutlinedTextField(
                     value = viewModel.email,
                     onValueChange = { viewModel.email = it },
                     label = { Text("メールアドレス") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Email,
+                            imeAction = ImeAction.Next,
+                        ),
                     singleLine = true,
+                    shape = RoundedCornerShape(cornerRadius),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        ),
+                    enabled = !viewModel.isLoading,
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 OutlinedTextField(
                     value = viewModel.password,
                     onValueChange = { viewModel.password = it },
                     label = { Text("パスワード") },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions =
+                        KeyboardOptions(
+                            keyboardType = KeyboardType.Password,
+                            imeAction = ImeAction.Done,
+                        ),
+                    visualTransformation = if (viewModel.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     singleLine = true,
+                    shape = RoundedCornerShape(cornerRadius),
+                    colors =
+                        OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                        ),
+                    trailingIcon = {
+                        val image =
+                            if (viewModel.passwordVisible) {
+                                Icons.Filled.VisibilityOff
+                            } else {
+                                Icons.Filled.Visibility
+                            }
+
+                        IconButton(onClick = { viewModel.passwordVisible = !viewModel.passwordVisible }) {
+                            Icon(
+                                imageVector = image,
+                                contentDescription = if (viewModel.passwordVisible) "Hide password" else "Show password",
+                            )
+                        }
+                    },
+                    enabled = !viewModel.isLoading,
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 Button(
@@ -94,7 +150,8 @@ fun AuthView(viewModel: AuthViewModel = AuthViewModel()) {
                         viewModel.email.isNotBlank() &&
                             viewModel.password.isNotBlank() &&
                             !viewModel.isLoading,
-                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(cornerRadius),
+                    modifier = Modifier.fillMaxWidth().height(52.dp),
                 ) {
                     if (viewModel.isLoading) {
                         CircularProgressIndicator(
@@ -108,7 +165,5 @@ fun AuthView(viewModel: AuthViewModel = AuthViewModel()) {
                 }
             }
         }
-
-        Spacer(modifier = Modifier.height(10.dp))
     }
 }
