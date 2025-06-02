@@ -11,7 +11,7 @@ import com.example.insighthub.ui.Screen
 import com.example.insighthub.ui.ScreenController
 import com.example.insighthub.ui.SplashView
 import com.example.insighthub.ui.auth.AuthView
-import com.example.insighthub.ui.home.GreetingView
+import com.example.insighthub.ui.home.HomeView
 import com.example.insighthub.ui.theme.InsightHubTheme
 
 @Preview
@@ -23,7 +23,7 @@ fun InsightHubApp() {
                 when (ScreenController.currentScreen) {
                     Screen.Splash -> SplashView()
                     Screen.Auth -> AuthView()
-                    Screen.Home -> GreetingView("Kotlin")
+                    Screen.Home -> HomeView()
                 }
             }
         }

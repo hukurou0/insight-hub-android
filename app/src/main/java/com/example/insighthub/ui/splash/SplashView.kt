@@ -9,21 +9,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.sp
-import com.example.insighthub.usecase.AuthUseCase
-import kotlinx.coroutines.delay
+import com.example.insighthub.ui.splash.SplashViewModel
 
 @Composable
-fun SplashView() {
+fun SplashView(viewModel: SplashViewModel = remember { SplashViewModel() }) {
     LaunchedEffect(Unit) {
-        delay(1000)
-        if (AuthUseCase.isLoggedIn()) {
-            ScreenController.setScreen(Screen.Home)
-        } else {
-            ScreenController.setScreen(Screen.Auth)
-        }
+        viewModel.initialize()
     }
 
     Box(

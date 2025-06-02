@@ -6,14 +6,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -34,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.insighthub.ui.components.PrimaryButton
 
 enum class AuthMode(
     val label: String,
@@ -74,10 +72,7 @@ fun AuthView(viewModel: AuthViewModel = remember { AuthViewModel() }) {
                     Tab(
                         text = { Text(mode.label) },
                         selected = viewModel.mode.ordinal == index,
-                        onClick = {
-                            val newMode = if (mode == AuthMode.LogIn) AuthMode.LogIn else AuthMode.SignUp
-                            viewModel.mode = newMode
-                        },
+                        onClick = { viewModel.onSelectAuthMode(mode) },
                         enabled = !viewModel.isLoading,
                     )
                 }
@@ -133,7 +128,7 @@ fun AuthView(viewModel: AuthViewModel = remember { AuthViewModel() }) {
                                 Icons.Filled.Visibility
                             }
 
-                        IconButton(onClick = { viewModel.passwordVisible = !viewModel.passwordVisible }) {
+                        IconButton(onClick = { viewModel.togglePasswordVisibility() }) {
                             Icon(
                                 imageVector = image,
                                 contentDescription = if (viewModel.passwordVisible) "Hide password" else "Show password",
@@ -144,25 +139,7 @@ fun AuthView(viewModel: AuthViewModel = remember { AuthViewModel() }) {
                     modifier = Modifier.fillMaxWidth(),
                 )
 
-                Button(
-                    onClick = { viewModel.authenticate() },
-                    enabled =
-                        viewModel.email.isNotBlank() &&
-                            viewModel.password.isNotBlank() &&
-                            !viewModel.isLoading,
-                    shape = RoundedCornerShape(cornerRadius),
-                    modifier = Modifier.fillMaxWidth().height(52.dp),
-                ) {
-                    if (viewModel.isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(18.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary,
-                        )
-                    } else {
-                        Text(viewModel.mode.label)
-                    }
-                }
+                PrimaryButton(text = viewModel.mode.label, onClick = { viewModel.authenticate() })
             }
         }
     }
