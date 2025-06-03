@@ -10,6 +10,8 @@ import com.example.insighthub.usecase.AuthUseCase
 import com.example.insighthub.usecase.BookUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import org.openapitools.client.models.BookAnalysisResult
 import org.openapitools.client.models.BookModel
@@ -20,6 +22,9 @@ import java.io.InputStream
 class CreationViewModel(
     val onDismiss: (BookModel?) -> Unit,
 ) : ViewModel() {
+    private val errorChannel = Channel<String>(Channel.BUFFERED)
+    val errorFlow = errorChannel.receiveAsFlow()
+
     var selectedImage by mutableStateOf<File?>(null)
     var takenPhotoUri by mutableStateOf<Uri?>(null)
     var bookAnalysisResult by mutableStateOf<BookAnalysisResult?>(null)
@@ -51,7 +56,7 @@ class CreationViewModel(
                 category = result.category
                 bookAnalysisResult = result
             } catch (error: Exception) {
-                print(error)
+                errorChannel.trySend(error.message.toString())
             } finally {
                 isAnalyzing = false
             }
@@ -70,7 +75,7 @@ class CreationViewModel(
                 val result = BookUseCase.create(userId = user.id, title!!, author!!, category!!, image.url)
                 onDismiss(result)
             } catch (error: Exception) {
-                print(error)
+                errorChannel.trySend(error.message.toString())
             } finally {
                 isCreating = false
             }
@@ -89,8 +94,8 @@ class CreationViewModel(
             inputStream?.close()
             outputStream.close()
             file
-        } catch (e: Exception) {
-            e.printStackTrace()
+        } catch (error: Exception) {
+            errorChannel.trySend(error.message.toString())
             null
         }
 }

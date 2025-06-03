@@ -32,6 +32,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,6 +49,7 @@ import com.example.insighthub.enum.BookCategory
 import com.example.insighthub.ui.components.OutlinedTextField
 import com.example.insighthub.ui.components.PickerMenu
 import com.example.insighthub.ui.components.PrimaryButton
+import kotlinx.coroutines.flow.collectLatest
 import org.openapitools.client.models.BookModel
 import java.io.File
 
@@ -101,6 +103,12 @@ fun CreationView(onDismiss: (BookModel?) -> Unit) {
 
     fun grantCameraPermission() {
         permissionLauncher.launch(Manifest.permission.CAMERA)
+    }
+
+    LaunchedEffect(Unit) {
+        viewModel.errorFlow.collectLatest { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
     }
 
     Box(

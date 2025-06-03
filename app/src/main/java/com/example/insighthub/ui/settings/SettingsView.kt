@@ -1,5 +1,6 @@
 package com.example.insighthub.ui.settings
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -22,13 +23,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.insighthub.ui.components.OutlinedButton
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun SettingsView(onDismiss: () -> Unit) {
+    val context = LocalContext.current
+
     val viewModel = remember { SettingsViewModel(onDismiss) }
     LaunchedEffect(Unit) {
         viewModel.initialize()
@@ -36,6 +41,12 @@ fun SettingsView(onDismiss: () -> Unit) {
 
     val configuration = LocalConfiguration.current
     val screenHeight = configuration.screenHeightDp.dp
+
+    LaunchedEffect(Unit) {
+        viewModel.errorFlow.collectLatest { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
 
     Box(
         modifier =

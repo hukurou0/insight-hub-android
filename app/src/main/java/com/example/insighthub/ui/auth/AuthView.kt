@@ -1,4 +1,5 @@
 package com.example.insighthub.ui.auth
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,9 +17,11 @@ import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -29,6 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.insighthub.ui.components.OutlinedTextField
 import com.example.insighthub.ui.components.PrimaryButton
+import kotlinx.coroutines.flow.collectLatest
 
 enum class AuthMode(
     val label: String,
@@ -40,6 +44,14 @@ enum class AuthMode(
 @Preview
 @Composable
 fun AuthView(viewModel: AuthViewModel = remember { AuthViewModel() }) {
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.errorFlow.collectLatest { message ->
+            Toast.makeText(context, message, Toast.LENGTH_SHORT).show()
+        }
+    }
+
     Column(
         modifier =
             Modifier
@@ -118,7 +130,12 @@ fun AuthView(viewModel: AuthViewModel = remember { AuthViewModel() }) {
                     viewModel.password = it
                 }
 
-                PrimaryButton(text = viewModel.mode.label, onClick = { viewModel.authenticate() })
+                PrimaryButton(
+                    text = viewModel.mode.label,
+                    onClick = { viewModel.authenticate() },
+                    enabled =
+                        viewModel.email.isNotEmpty() && viewModel.password.isNotEmpty(),
+                )
             }
         }
     }

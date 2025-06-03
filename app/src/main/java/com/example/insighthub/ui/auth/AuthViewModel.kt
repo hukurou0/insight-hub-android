@@ -9,9 +9,14 @@ import com.example.insighthub.ui.ScreenController
 import com.example.insighthub.usecase.AuthUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 
 class AuthViewModel : ViewModel() {
+    private val errorChannel = Channel<String>(Channel.BUFFERED)
+    val errorFlow = errorChannel.receiveAsFlow()
+
     var mode by mutableStateOf(AuthMode.LogIn)
     var email by mutableStateOf("")
     var password by mutableStateOf("")
@@ -28,7 +33,7 @@ class AuthViewModel : ViewModel() {
                 }
                 ScreenController.setScreen(Screen.Home)
             } catch (error: Exception) {
-                print(error)
+                errorChannel.trySend(error.message.toString())
             } finally {
                 isLoading = false
             }
