@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.insighthub"
+    namespace = "com.huku.insighthub"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.insighthub"
+        applicationId = "com.huku.insighthub"
         minSdk = 30
         targetSdk = 35
         versionCode = 1
