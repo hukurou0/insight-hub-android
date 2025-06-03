@@ -27,7 +27,7 @@ class AuthViewModel : ViewModel() {
                     AuthMode.SignUp -> signUp()
                 }
                 ScreenController.setScreen(Screen.Home)
-            } catch (error: Throwable) {
+            } catch (error: Exception) {
                 print(error)
             } finally {
                 isLoading = false

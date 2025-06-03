@@ -12,7 +12,7 @@ sealed class Constant {
             get() =
                 when (this) {
                     is Base -> "https://insight-hub-kappa.vercel.app/"
-                    is Book -> "https://insight-hub-kappa.vercel.app/books/$id"
+                    is Book -> "https://insight-hub-kappa.vercel.app/#/books/$id"
                 }
     }
 }

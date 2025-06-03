@@ -3,10 +3,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
@@ -14,8 +12,6 @@ import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
@@ -31,6 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.insighthub.ui.components.OutlinedTextField
 import com.example.insighthub.ui.components.PrimaryButton
 
 enum class AuthMode(
@@ -81,45 +78,27 @@ fun AuthView(viewModel: AuthViewModel = remember { AuthViewModel() }) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-                val cornerRadius = 12.dp
-
                 OutlinedTextField(
-                    value = viewModel.email,
-                    onValueChange = { viewModel.email = it },
-                    label = { Text("メールアドレス") },
+                    label = "メールアドレス",
+                    text = viewModel.email,
                     keyboardOptions =
                         KeyboardOptions(
                             keyboardType = KeyboardType.Email,
                             imeAction = ImeAction.Next,
                         ),
-                    singleLine = true,
-                    shape = RoundedCornerShape(cornerRadius),
-                    colors =
-                        OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                        ),
-                    enabled = !viewModel.isLoading,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                ) {
+                    viewModel.email = it
+                }
 
                 OutlinedTextField(
-                    value = viewModel.password,
-                    onValueChange = { viewModel.password = it },
-                    label = { Text("パスワード") },
+                    label = "パスワード",
+                    text = viewModel.password,
                     keyboardOptions =
                         KeyboardOptions(
                             keyboardType = KeyboardType.Password,
                             imeAction = ImeAction.Done,
                         ),
                     visualTransformation = if (viewModel.passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                    singleLine = true,
-                    shape = RoundedCornerShape(cornerRadius),
-                    colors =
-                        OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.outline,
-                        ),
                     trailingIcon = {
                         val image =
                             if (viewModel.passwordVisible) {
@@ -135,9 +114,9 @@ fun AuthView(viewModel: AuthViewModel = remember { AuthViewModel() }) {
                             )
                         }
                     },
-                    enabled = !viewModel.isLoading,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                ) {
+                    viewModel.password = it
+                }
 
                 PrimaryButton(text = viewModel.mode.label, onClick = { viewModel.authenticate() })
             }

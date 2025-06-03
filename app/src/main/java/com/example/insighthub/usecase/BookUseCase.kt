@@ -1,6 +1,5 @@
 package com.example.insighthub.usecase
 
-import com.example.insighthub.enum.BookCategory
 import com.example.insighthub.repository.BookRepository
 import com.example.insighthub.repository.SessionRepository
 import org.openapitools.client.infrastructure.ClientException
@@ -22,14 +21,14 @@ object BookUseCase {
         userId: String,
         title: String,
         author: String,
-        category: BookCategory,
+        category: String,
         coverImageURL: String?,
     ): BookModel {
         val session = SessionRepository.session
         if (session == null) {
             throw IllegalStateException("Session is not available")
         }
-        return BookRepository.create(userId, title, author, category.value, coverImageURL)
+        return BookRepository.create(userId, title, author, category, coverImageURL)
     }
 
     @Throws(

@@ -1,14 +1,18 @@
 package com.example.insighthub.ui.home
 
+import CompletionOverlay
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawing
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -26,6 +30,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -34,11 +39,19 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.insighthub.ui.components.PrimaryButton
+import com.example.insighthub.ui.creation.CreationView
+import com.example.insighthub.ui.settings.SettingsView
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeView(viewModel: HomeViewModel = remember { HomeViewModel() }) {
-    val sheetState =
+    val coroutineScope = rememberCoroutineScope()
+    val addingSheetState =
+        rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+        )
+    val settingsSheetState =
         rememberModalBottomSheetState(
             skipPartiallyExpanded = true,
         )
@@ -57,7 +70,7 @@ fun HomeView(viewModel: HomeViewModel = remember { HomeViewModel() }) {
             )
 
             IconButton(
-                onClick = { viewModel.onTapAddBookButton() },
+                onClick = { viewModel.onTapSettingsButton() },
             ) {
                 Icon(
                     imageVector = Icons.Default.Settings,
@@ -104,19 +117,40 @@ fun HomeView(viewModel: HomeViewModel = remember { HomeViewModel() }) {
         }
     }
 
+    if (viewModel.addedBook != null) {
+        CompletionOverlay(
+            viewModel.addedBook!!,
+            onOpenBookInBrowser = { viewModel.onTapOpenInWebButton(context, it) },
+            onClose = { viewModel.addedBook = null },
+        )
+    }
+
+    if (viewModel.isSettingsSheetPresented) {
+        ModalBottomSheet(
+            onDismissRequest = { viewModel.isSettingsSheetPresented = false },
+            sheetState = settingsSheetState,
+        ) {
+            SettingsView {
+                coroutineScope.launch {
+                    settingsSheetState.hide()
+                    viewModel.isSettingsSheetPresented = false
+                }
+            }
+        }
+    }
+
     if (viewModel.isAddingSheetPresented) {
         ModalBottomSheet(
             onDismissRequest = { viewModel.isAddingSheetPresented = false },
-            sheetState = sheetState,
+            sheetState = addingSheetState,
+            modifier = Modifier.padding(top = WindowInsets.safeDrawing.asPaddingValues().calculateTopPadding()),
         ) {
-            Column(
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally,
-            ) {
-                Text("This is a modal sheet!", style = MaterialTheme.typography.titleMedium)
+            CreationView { book ->
+                coroutineScope.launch {
+                    addingSheetState.hide()
+                    viewModel.isAddingSheetPresented = false
+                    viewModel.addedBook = book
+                }
             }
         }
     }
